@@ -63,3 +63,33 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `investors`
+--
+
+CREATE TABLE `investors` (
+  `id` int(11) NOT NULL,
+  `fname` varchar(40) NOT NULL,
+  `lname` varchar(40) NOT NULL,
+  `venture_name` varchar(40) NOT NULL,
+  `contact` varchar(40) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `investor_type` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Indexes for table `investors`
+--
+ALTER TABLE `investors`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for table `investors`
+--
+ALTER TABLE `investors`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+COMMIT;

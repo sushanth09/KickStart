@@ -23,3 +23,15 @@ class StartUps(BaseModel):
 
     class Meta:
         db_table = 'startups'
+
+class Investors(BaseModel):
+    id = PrimaryKeyField(null=False)
+    fname = CharField(max_length=40)
+    lname = CharField(max_length=40)
+    venture_name = CharField(max_length=40)
+    contact = CharField(max_length=40)
+    email = CharField(max_length=40)
+    investor_type = IntegerField(null=False)
+
+    class Meta:
+        db_table = 'investors'

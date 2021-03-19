@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, status, HTTPException
 from starlette.responses import Response
-from .models import StartUps
+from .models import StartUps,Investors
 import peewee
 from pydantic import BaseModel
 from typing import List
@@ -64,3 +64,58 @@ def delete_startup(email: str):
     if del_startUps is None:
         return {"status_code": 404, "description": "Startup not found"}
     return {"status_code": 200, "description": "Startup successfully deleted"}
+
+
+class InvestorsModel(BaseModel):
+    id:int
+    fname: str
+    lname:str
+    venture_name:str
+    contact: str
+    email: str
+    investor_type: int
+
+    class Config:
+        orm_mode = True
+
+
+@router.post("/investors/create", response_model=InvestorsModel)
+async def create(fname:str, lname:str, venture_name: str,  contact: str, email: str, investor_type: int):
+    """
+    Add a new Investor to DB
+    """
+    investor_object = Investors(
+        fname=fname,
+        lname=lname,
+        venture_name=venture_name,
+        contact=contact,
+        email=email,
+        investor_type=investor_type
+)
+    investor_object.save()
+    return investor_object
+
+@router.get("/investors/get", response_model=List[InvestorsModel])
+def get_all_investors():
+    """
+    Get list of all Investors
+    """
+    return list(Investors.select().offset(0).limit(100))
+
+
+@router.get("/investors/view/{email}", response_model=InvestorsModel)
+def get_investor(email: str):
+    """
+    Get a investor details by email
+    """
+    return Investors.filter(Investors.email == email).first()
+
+@router.delete("/investors/{email}")
+def delete_investors(email: str):
+    """
+    Delete a investor by email
+    """
+    del_investors = Investors.delete().where(Investors.email == email).execute()
+    if del_investors is None:
+        return {"status_code": 404, "description": "Investor not found"}
+    return {"status_code": 200, "description": "Investor successfully deleted"}
