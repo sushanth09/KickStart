@@ -48,7 +48,7 @@ def get_all_startups():
 
 
 @router.get("/view/{email}", response_model=StartUpModel)
-def get_contact(email: str):
+def get_startup(email: str):
     """
     Get a startup details by email
     """
@@ -56,11 +56,11 @@ def get_contact(email: str):
     
 
 @router.delete("/{email}")
-def delete_contact(email: str):
+def delete_startup(email: str):
     """
     Delete a startup by email
     """
     del_startUps = StartUps.delete().where(StartUps.email == email).execute()
     if del_startUps is None:
-        return {"status_code": 404, "description": "Contact not found"}
-    return {"status_code": 200, "description": "Contact successfully deleted"}
+        return {"status_code": 404, "description": "Startup not found"}
+    return {"status_code": 200, "description": "Startup successfully deleted"}
