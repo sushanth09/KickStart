@@ -1,0 +1,14 @@
+click==7.1.2
+dataclasses==0.8
+fastapi==0.63.0
+greenlet==1.0.0
+h11==0.12.0
+importlib-metadata==3.7.3
+peewee==3.14.3
+pydantic==1.8.1
+PyMySQL==1.0.2
+SQLAlchemy==1.4.1
+starlette==0.13.6
+typing-extensions==3.7.4.3
+uvicorn==0.13.4
+zipp==3.4.1
