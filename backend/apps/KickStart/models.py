@@ -10,8 +10,6 @@ class BaseModel(Model):
         database = conn
 
 
-
-
 class StartUps(BaseModel):
     id = PrimaryKeyField(null=False)
     company_name = CharField(max_length=40)

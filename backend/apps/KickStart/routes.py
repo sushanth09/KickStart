@@ -21,7 +21,7 @@ class StartUpModel(BaseModel):
         orm_mode = True
 
 
-@router.post("/", response_model=StartUpModel)
+@router.post("/startup/create", response_model=StartUpModel)
 async def create(company_name: str, email: str, contact: str, product_name: str, ps: str, industry: str, funding_goal: int):
     """
     Add a new Startup to DB
@@ -39,7 +39,7 @@ async def create(company_name: str, email: str, contact: str, product_name: str,
     return startup_object
 
 
-@router.get("/", response_model=List[StartUpModel])
+@router.get("/startup/get", response_model=List[StartUpModel])
 def get_all_startups():
     """
     Get list of all Startups
@@ -47,7 +47,7 @@ def get_all_startups():
     return list(StartUps.select().offset(0).limit(100))
 
 
-@router.get("/view/{email}", response_model=StartUpModel)
+@router.get("/startup/view/{email}", response_model=StartUpModel)
 def get_startup(email: str):
     """
     Get a startup details by email
@@ -55,7 +55,7 @@ def get_startup(email: str):
     return StartUps.filter(StartUps.email == email).first()
     
 
-@router.delete("/{email}")
+@router.delete("/startup/{email}")
 def delete_startup(email: str):
     """
     Delete a startup by email
