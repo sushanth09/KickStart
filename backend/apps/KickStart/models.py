@@ -4,6 +4,8 @@ from typing import Optional
 from config import conn
 from peewee import *
 from pydantic import BaseModel
+from datetime import date, datetime
+
 
 class BaseModel(Model):
     class Meta:
@@ -35,3 +37,15 @@ class Investors(BaseModel):
 
     class Meta:
         db_table = 'investors'
+		
+class UserReg(BaseModel):
+    id = PrimaryKeyField(null=False)
+    email = CharField(max_length=40)
+    password = CharField(max_length=100)
+    account_type = IntegerField()
+    last_login = datetime
+    last_logout = datetime
+    access_token = CharField(max_length=100)
+    is_disabled = BooleanField(default=False)
+    class Meta:
+        db_table = 'user_reg'
