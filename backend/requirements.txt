@@ -1,5 +1,5 @@
 click==7.1.2
-dataclasses==0.8
+dataclasses==0.6
 fastapi==0.63.0
 greenlet==1.0.0
 h11==0.12.0

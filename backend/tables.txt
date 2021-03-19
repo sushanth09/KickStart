@@ -1,0 +1,40 @@
+Registration table
+	id						int pk
+	email					str not null
+	password				str not null
+	lastlogin				date_time
+	lastlogout				date_time
+	is_disabled				bool
+	account_type			int                  1 - start_up, 2 - investor
+
+
+
+Startup_Profile
+	id 						int pk
+	fname					str
+	lname					str
+	contact					str (14)
+	email					str
+	Business / Product name str
+	Problem statement		str
+	Industry				str
+	Funding Goal			int
+	Duration to start (EST) str
+	current_funds			int  default 0
+
+
+investor_profile
+	id						int pk
+	fname					str
+	lname					str
+	venture_name			str
+	contact					str
+	email					str
+	investor_type			int
+
+investments
+	id						int pk
+	investor_id  			int fk
+	startup_id   			int	fk
+	invested_amount			int
+	date_of_investment		date_time
