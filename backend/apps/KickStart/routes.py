@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, status, HTTPException
+from starlette.responses import Response
 from .models import StartUps
 import peewee
 from pydantic import BaseModel
@@ -44,3 +45,22 @@ def get_all_startups():
     Get list of all Startups
     """
     return list(StartUps.select().offset(0).limit(100))
+
+
+@router.get("/view/{email}", response_model=StartUpModel)
+def get_contact(email: str):
+    """
+    Get a startup details by email
+    """
+    return StartUps.filter(StartUps.email == email).first()
+    
+
+@router.delete("/{email}")
+def delete_contact(email: str):
+    """
+    Delete a startup by email
+    """
+    del_startUps = StartUps.delete().where(StartUps.email == email).execute()
+    if del_startUps is None:
+        return {"status_code": 404, "description": "Contact not found"}
+    return {"status_code": 200, "description": "Contact successfully deleted"}
