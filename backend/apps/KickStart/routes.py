@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, status, HTTPException, Depends, File, UploadFile
 from .models import StartUps, Investors, UserReg, Investments
+import peewee, json
 from pydantic import BaseModel
 from typing import List
 import os
@@ -51,13 +52,10 @@ class InvestorsModel(BaseModel):
 
 
 class InvestmentModel(BaseModel):
-    id: int
     investor_id: int
     startup_id: int
     invested_amount: int
-    date_of_investment: datetime
     has_access: bool
-
     class Config:
         orm_mode = True
 
@@ -246,7 +244,7 @@ async def register_user(email: str, password: str, account_type: int):
             user_object = UserReg(
                 email=email,
                 password=get_password_hash(password),
-                account_type=account_type,
+                account_type=account_type
             )
             user_object.save()
             message = "User Registered successfully."
@@ -284,8 +282,9 @@ def request_access(startupId: int, investorId: int):
 
 @router.post("/startup/grantAccess/")
 def grantAccess(investor_id: int, startup_id: int):
-    # grant access to investor.
+    #grant access to investor.
     message = ""
+    has_access = 0
     try:
         investor_data = Investments.filter(
             Investments.startup_id == startup_id, Investments.investor_id == investor_id
@@ -298,22 +297,35 @@ def grantAccess(investor_id: int, startup_id: int):
             message = "Error while granting access."
     except:
         traceback.print_exc()
-    return {"message": message}
+    return {"message": message, "has_access": has_access}
 
 
-@router.post("/startup/getRequestAccessData/")
-def getRequestAccessData(investor_id: int, startup_id: int):
-    # grant access to investor.
-    data = {}
+@router.post("/startup/getAllRequestAccessData/", response_model=List[InvestmentModel])
+def getRequestAccessData(startup_id: int):
+    #grant access to investor.
+    data = []
     try:
         investor_data = Investments.filter(Investments.startup_id == startup_id)
         if investor_data:
-            data = {
-                "investor_data": list(investor_data),
-                "message": "Data fetched successfully.",
-            }
-        else:
-            data = {"investor_data": list(investor_data), "message": "Access granted."}
+            data = list(investor_data)
     except:
         traceback.print_exc()
     return data
+
+
+@router.post("/investor/investFunds/")
+def investFunds(investor_id: int, startup_id: int, invested_amt: int):
+    #grant access to investor.
+    message = ""
+    try:
+        investment_data = Investments.filter(Investments.startup_id == startup_id, Investments.investor_id == investor_id).first()
+        if investment_data:
+            if investment_data.has_access == 1:
+                investment_data.invested_amount += invested_amt 
+            investment_data.save()
+            message = "Congrats! You have invested " + str(invested_amt)
+        else:
+            message = "You don't have access to invest the amount."
+    except:
+        traceback.print_exc()
+    return {"message": message}
