@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, status, HTTPException
 from starlette.responses import Response
-from .models import StartUps,Investors, UserReg
+from .models import StartUps,Investors, UserReg, Investments
 import peewee, traceback, json
 from pydantic import BaseModel
 from typing import List
@@ -31,6 +31,28 @@ class UserModel(BaseModel):
     class Config:
         orm_mode = True
 
+class InvestorsModel(BaseModel):
+    id:int
+    fname: str
+    lname:str
+    venture_name:str
+    contact: str
+    email: str
+    investor_type: int
+
+    class Config:
+        orm_mode = True
+
+
+class InvestmentModel(BaseModel):
+    id: int
+    investor_id: int
+    startup_id: int
+    invested_amount: int
+    date_of_investment: datetime
+    has_access: bool
+    class Config:
+        orm_mode = True
 
 @router.post("/startup/create", response_model=StartUpModel)
 async def create(company_name: str, email: str, contact: str, product_name: str, ps: str, industry: str, funding_goal: int):
@@ -78,19 +100,6 @@ def delete_startup(email: str):
 
 def get_all_users():
     return list(UserReg.select().offset(0).limit(100))
-
-class InvestorsModel(BaseModel):
-    id:int
-    fname: str
-    lname:str
-    venture_name:str
-    contact: str
-    email: str
-    investor_type: int
-
-    class Config:
-        orm_mode = True
-
 
 @router.post("/investors/create", response_model=InvestorsModel)
 async def create(fname:str, lname:str, venture_name: str,  contact: str, email: str, investor_type: int):
@@ -199,3 +208,55 @@ async def register_user(email: str, password: str, account_type: int):
         traceback.print_exc()
     return {"message": message}
 
+@router.post("/investors/requestAccess/")
+def request_access(startupId: int, investorId: int):
+    message = ""
+    try:
+        user_reg = Investments.filter(Investments.startup_id == startupId, Investments.investor_id == investorId).first()
+        if not user_reg:
+            investment_object = Investments(
+                investor_id=investorId,
+                startup_id=startupId, 
+            )
+            investment_object.save()
+            message = "Request sent successfully."
+        else:
+            return HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="There has been some server issue.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except:
+        traceback.print_exc()
+    return message
+
+@router.post("/startup/grantAccess/")
+def grantAccess(investor_id: int, startup_id: int):
+    #grant access to investor.
+    message = ""
+    try:
+        investor_data = Investments.filter(Investments.startup_id == startupId, Investments.investor_id == investorId).first()
+        if investor_data:
+            investor_data.has_access = 1
+            investor_data.save()
+            message = "Access granted."
+        else:
+            message = "Error while granting access."
+    except:
+        traceback.print_exc()
+    return {"message": message}
+
+@router.post("/startup/getRequestAccessData/")
+def getRequestAccessData(investor_id: int, startup_id: int):
+    #grant access to investor.
+    data = {}
+    try:
+        investor_data = Investments.filter(Investments.startup_id == startup_id)
+        if investor_data:
+            message = "Access granted."
+            data = {"investor_data": list(investor_data), "message": "Data fetched successfully."}
+        else:
+            data = {"investor_data": list(investor_data), "message": message}
+    except:
+        traceback.print_exc()
+    return data

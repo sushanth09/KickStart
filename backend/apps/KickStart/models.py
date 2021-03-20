@@ -49,3 +49,13 @@ class UserReg(BaseModel):
     is_disabled = BooleanField(default=False)
     class Meta:
         db_table = 'user_reg'
+
+class Investments(BaseModel):
+    id = PrimaryKeyField(null=False)
+    investor_id = IntegerField(null=False)
+    startup_id = IntegerField(null=False)
+    invested_amount = IntegerField(null=False)
+    date_of_investment = datetime
+    has_access = IntegerField(default=False)
+    class Meta:
+        db_table = 'investments'

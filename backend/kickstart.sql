@@ -92,4 +92,26 @@ ALTER TABLE `investors`
 --
 ALTER TABLE `investors`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+
+
+CREATE TABLE `investments` (
+  `id` int(11) NOT NULL,
+  `investor_id` int(11) NOT NULL,
+  `startup_id` int(11) NOT NULL,
+  `invested_amount` int(11) NOT NULL DEFAULT 0,
+  `date_of_investment` datetime NOT NULL,
+  `has_access` int DEFAULT 0,
+  FOREIGN KEY(investor_id) REFERENCES investors(id),
+  FOREIGN KEY(startup_id) REFERENCES startups(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `investments`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for table `investors`
+--
+ALTER TABLE `investments`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 COMMIT;
