@@ -18,13 +18,15 @@ class StartUps(BaseModel):
     email = CharField(max_length=40)
     contact = CharField(max_length=40)
     product_name = CharField(max_length=20)
-    problem_statement = CharField(max_length=100)
+    problem_statement = CharField(max_length=1000)
     industry = CharField(max_length=20)  # Category
     funding_goal = IntegerField(null=False)
     current_funds = IntegerField(default=0)
+    company_logo = CharField(max_length=100, null=True)
 
     class Meta:
-        db_table = 'startups'
+        db_table = "startups"
+
 
 class Investors(BaseModel):
     id = PrimaryKeyField(null=False)
@@ -36,8 +38,9 @@ class Investors(BaseModel):
     investor_type = IntegerField(null=False)
 
     class Meta:
-        db_table = 'investors'
-		
+        db_table = "investors"
+
+
 class UserReg(BaseModel):
     id = PrimaryKeyField(null=False)
     email = CharField(max_length=40)
@@ -47,8 +50,10 @@ class UserReg(BaseModel):
     last_logout = datetime
     access_token = CharField(max_length=100)
     is_disabled = BooleanField(default=False)
+
     class Meta:
-        db_table = 'user_reg'
+        db_table = "user_reg"
+
 
 class Investments(BaseModel):
     id = PrimaryKeyField(null=False)
@@ -57,5 +62,6 @@ class Investments(BaseModel):
     invested_amount = IntegerField(null=False)
     date_of_investment = datetime
     has_access = IntegerField(default=False)
+
     class Meta:
-        db_table = 'investments'
+        db_table = "investments"

@@ -5,6 +5,25 @@ import { Link } from "react-router-dom";
 
 import IndexDropdown from "components/Dropdowns/IndexDropdown.js";
 
+
+
+
+function handleLogout(){
+  if(window.localStorage.getItem("isLoggedIn")){
+    const url = `http://localhost:8000/kickstart/logout/${window.localStorage.getItem("email")}`;
+    fetch(url,{
+        method: "post",
+    }).then((response) => response.json())
+    .then(data => {
+        console.log(data)
+        window.localStorage.setItem("email", undefined);
+        window.localStorage.setItem("access_token", undefined);
+        window.localStorage.setItem("isLoggedIn", false);
+    })
+  }
+}
+
+
 export default function Navbar(props) {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
   return (
@@ -33,63 +52,56 @@ export default function Navbar(props) {
             }
             id="example-navbar-warning"
           >
-            <ul className="flex flex-col lg:flex-row list-none mr-auto">
-              <li className="flex items-center">
-                <a
-                  className="hover:text-gray-600 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
-                  href="https://www.creative-tim.com/learning-lab/tailwind/react/overview/notus?ref=nr-index-navbar"
-                >
-                  <i className="text-gray-500 far fa-file-alt text-lg leading-lg mr-2" />{" "}
-                  Docs
-                </a>
-              </li>
-            </ul>
-            <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
+          <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
               <li className="flex items-center">
                 <IndexDropdown />
               </li>
               <li className="flex items-center">
                 <a
-                  className="hover:text-gray-600 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
-                  href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdemos.creative-tim.com%2Fnotus-react%2F%23%2F"
+                  className="lg:text-black lg:hover:text-gray-500 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                  // href=""
                   target="_blank"
                 >
-                  <i className="text-gray-500 fab fa-facebook text-lg leading-lg " />
-                  <span className="lg:hidden inline-block ml-2">Share</span>
+                  <h1>FAQ</h1>
                 </a>
               </li>
 
               <li className="flex items-center">
                 <a
-                  className="hover:text-gray-600 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
-                  href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fdemos.creative-tim.com%2Fnotus-react%2F%23%2F&text=Start%20your%20development%20with%20a%20Free%20Tailwind%20CSS%20and%20React%20UI%20Kit%20and%20Admin.%20Let%20Notus%20React%20amaze%20you%20with%20its%20cool%20features%20and%20build%20tools%20and%20get%20your%20project%20to%20a%20whole%20new%20level.%20"
+                  className="lg:text-black lg:hover:text-gray-500 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                  // href=""
                   target="_blank"
                 >
-                  <i className="text-gray-500 fab fa-twitter text-lg leading-lg " />
-                  <span className="lg:hidden inline-block ml-2">Tweet</span>
+                  <h1>About</h1>
                 </a>
               </li>
 
               <li className="flex items-center">
-                <a
-                  className="hover:text-gray-600 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
-                  href="https://github.com/creativetimofficial/notus-react?ref=nr-index-navbar"
+                <span
+                  className="lg:text-black lg:hover:text-gray-500 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                  // href=""
                   target="_blank"
                 >
-                  <i className="text-gray-500 fab fa-github text-lg leading-lg " />
-                  <span className="lg:hidden inline-block ml-2">Star</span>
-                </a>
+                  {window.localStorage.getItem("access_token") !== "undefined" ?
+                    <Link to="/profile">Profile</Link>  
+                    : <Link to="/auth/login">Login</Link>  
+                  }
+                </span>
               </li>
+                {window.localStorage.getItem("access_token") !== "undefined"? 
+                  <li className="flex items-center">
+                  <button
+                    className="lg:text-black lg:hover:text-gray-500 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                    onClick={handleLogout}
+                  >
+                    Logout                    
+                  </button>
+                </li>
+                : null
+                }
 
-              <li className="flex items-center">
-                <button
-                  className="bg-blue-500 text-white active:bg-blue-600 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none lg:mr-1 lg:mb-0 ml-3 mb-3 ease-linear transition-all duration-150"
-                  type="button"
-                >
-                  <i className="fas fa-arrow-alt-circle-down"></i> Download
-                </button>
-              </li>
             </ul>
+ 
           </div>
         </div>
       </nav>

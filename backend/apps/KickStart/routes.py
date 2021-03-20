@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Request, status, HTTPException
-from starlette.responses import Response
-from .models import StartUps,Investors, UserReg, Investments
-import peewee, traceback, json
+from fastapi import APIRouter, Request, status, HTTPException, Depends, File, UploadFile
+from .models import StartUps, Investors, UserReg, Investments
 from pydantic import BaseModel
 from typing import List
+import os
+from starlette.responses import RedirectResponse
 from config.utility import *
-
+import traceback
+from datetime import datetime
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 router = APIRouter()
 
+
 class StartUpModel(BaseModel):
-    id:int
+    id: int
     company_name: str
     email: str
     contact: str
@@ -18,9 +21,11 @@ class StartUpModel(BaseModel):
     problem_statement: str
     industry: str
     funding_goal: int
+    company_logo: str
 
     class Config:
         orm_mode = True
+
 
 class UserModel(BaseModel):
     id: int
@@ -31,11 +36,12 @@ class UserModel(BaseModel):
     class Config:
         orm_mode = True
 
+
 class InvestorsModel(BaseModel):
-    id:int
+    id: int
     fname: str
-    lname:str
-    venture_name:str
+    lname: str
+    venture_name: str
     contact: str
     email: str
     investor_type: int
@@ -51,23 +57,50 @@ class InvestmentModel(BaseModel):
     invested_amount: int
     date_of_investment: datetime
     has_access: bool
+
     class Config:
         orm_mode = True
 
+
 @router.post("/startup/create", response_model=StartUpModel)
-async def create(company_name: str, email: str, contact: str, product_name: str, ps: str, industry: str, funding_goal: int):
+async def create(
+    company_name: str,
+    email: str,
+    contact: str,
+    product_name: str,
+    ps: str,
+    industry: str,
+    funding_goal: int,
+    company_logo: UploadFile = File(...),
+):
     """
     Add a new Startup to DB
     """
+
+    baseDir = os.path.dirname(os.path.abspath(__file__))
+
+    uploads_dir = os.path.join(baseDir, "static/logos/" + email)
+    if not os.path.exists(uploads_dir):
+        os.makedirs(os.path.join(baseDir, "static/logos/" + email))
+
+    file_location = f"{uploads_dir}\{company_logo.filename}"
+
+    with open(file_location, "wb+") as file_object:
+        file_object.write(company_logo.file.read())
+
+    # image = Request.url_for(name="static", path=f"/logos/{email}/logo.jpg")
+    # print(">>>>>>>>>>>>>>>>>>>>>>", image)
     startup_object = StartUps(
         company_name=company_name,
-        email=email, 
+        email=email,
         contact=contact,
         product_name=product_name,
         problem_statement=ps,
         industry=industry,
-        funding_goal=funding_goal
+        funding_goal=funding_goal,
+        company_logo=file_location,
     )
+
     startup_object.save()
     return startup_object
 
@@ -86,23 +119,32 @@ def get_startup(email: str):
     Get a startup details by email
     """
     return StartUps.filter(StartUps.email == email).first()
-    
 
-@router.delete("/startup/{email}")
-def delete_startup(email: str):
+
+@router.delete("/startup/{id}")
+def delete_startup(id: int):
     """
-    Delete a startup by email
+    Delete a startup by id
     """
-    del_startUps = StartUps.delete().where(StartUps.email == email).execute()
+    del_startUps = StartUps.delete().where(StartUps.id == id).execute()
     if del_startUps is None:
         return {"status_code": 404, "description": "Startup not found"}
     return {"status_code": 200, "description": "Startup successfully deleted"}
 
+
 def get_all_users():
     return list(UserReg.select().offset(0).limit(100))
 
+
 @router.post("/investors/create", response_model=InvestorsModel)
-async def create(fname:str, lname:str, venture_name: str,  contact: str, email: str, investor_type: int):
+async def create(
+    fname: str,
+    lname: str,
+    venture_name: str,
+    contact: str,
+    email: str,
+    investor_type: int,
+):
     """
     Add a new Investor to DB
     """
@@ -112,10 +154,11 @@ async def create(fname:str, lname:str, venture_name: str,  contact: str, email: 
         venture_name=venture_name,
         contact=contact,
         email=email,
-        investor_type=investor_type
-)
+        investor_type=investor_type,
+    )
     investor_object.save()
     return investor_object
+
 
 @router.get("/investors/get", response_model=List[InvestorsModel])
 def get_all_investors():
@@ -125,23 +168,24 @@ def get_all_investors():
     return list(Investors.select().offset(0).limit(100))
 
 
-@router.get("/investors/view/{email}", response_model=InvestorsModel)
-def get_investor(email: str):
+@router.get("/investors/view/{id}", response_model=InvestorsModel)
+def get_investor(id: int):
     """
-    Get a investor details by email
+    Get a investor details by id
     """
-    return Investors.filter(Investors.email == email).first()
+    return Investors.filter(Investors.id == id).first()
 
-@router.delete("/investors/{email}")
-def delete_investors(email: str):
+
+@router.delete("/investors/{id}")
+def delete_investors(id: int):
     """
-    Delete a investor by email
+    Delete a investor by id
     """
-    del_investors = Investors.delete().where(Investors.email == email).execute()
+    del_investors = Investors.delete().where(Investors.id == id).execute()
     if del_investors is None:
         return {"status_code": 404, "description": "Investor not found"}
     return {"status_code": 200, "description": "Investor successfully deleted"}
-	
+
 
 @router.post("/login")
 async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -149,8 +193,8 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
     data = {}
     try:
         users_db = UserReg.filter(UserReg.email == form_data.username).first()
-        #print("users_data: ", users_db.email, " form_data: ", form_data.username, " password: ", form_data.password)
-        
+        # print("users_data: ", users_db.email, " form_data: ", form_data.username, " password: ", form_data.password)
+
         user = authenticate_user(users_db, form_data.username, form_data.password)
         if not user:
             return HTTPException(
@@ -167,8 +211,12 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
             users_db.access_token = access_token
             users_db.last_login = datetime.now()
             users_db.save()
-        
-        data = {"access_token": access_token, "token_type": "bearer", "email": user.email}
+
+        data = {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "email": user.email,
+        }
     except:
         traceback.print_exc()
     return data
@@ -188,7 +236,7 @@ async def logout(email: str):
     except:
         traceback.print_exc()
     return {"message": message}
-    
+
 
 @router.post("/register")
 async def register_user(email: str, password: str, account_type: int):
@@ -198,7 +246,7 @@ async def register_user(email: str, password: str, account_type: int):
             user_object = UserReg(
                 email=email,
                 password=get_password_hash(password),
-                account_type=account_type
+                account_type=account_type,
             )
             user_object.save()
             message = "User Registered successfully."
@@ -208,15 +256,18 @@ async def register_user(email: str, password: str, account_type: int):
         traceback.print_exc()
     return {"message": message}
 
+
 @router.post("/investors/requestAccess/")
 def request_access(startupId: int, investorId: int):
     message = ""
     try:
-        user_reg = Investments.filter(Investments.startup_id == startupId, Investments.investor_id == investorId).first()
+        user_reg = Investments.filter(
+            Investments.startup_id == startupId, Investments.investor_id == investorId
+        ).first()
         if not user_reg:
             investment_object = Investments(
                 investor_id=investorId,
-                startup_id=startupId, 
+                startup_id=startupId,
             )
             investment_object.save()
             message = "Request sent successfully."
@@ -230,12 +281,15 @@ def request_access(startupId: int, investorId: int):
         traceback.print_exc()
     return message
 
+
 @router.post("/startup/grantAccess/")
 def grantAccess(investor_id: int, startup_id: int):
-    #grant access to investor.
+    # grant access to investor.
     message = ""
     try:
-        investor_data = Investments.filter(Investments.startup_id == startupId, Investments.investor_id == investorId).first()
+        investor_data = Investments.filter(
+            Investments.startup_id == startup_id, Investments.investor_id == investor_id
+        ).first()
         if investor_data:
             investor_data.has_access = 1
             investor_data.save()
@@ -246,17 +300,20 @@ def grantAccess(investor_id: int, startup_id: int):
         traceback.print_exc()
     return {"message": message}
 
+
 @router.post("/startup/getRequestAccessData/")
 def getRequestAccessData(investor_id: int, startup_id: int):
-    #grant access to investor.
+    # grant access to investor.
     data = {}
     try:
         investor_data = Investments.filter(Investments.startup_id == startup_id)
         if investor_data:
-            message = "Access granted."
-            data = {"investor_data": list(investor_data), "message": "Data fetched successfully."}
+            data = {
+                "investor_data": list(investor_data),
+                "message": "Data fetched successfully.",
+            }
         else:
-            data = {"investor_data": list(investor_data), "message": message}
+            data = {"investor_data": list(investor_data), "message": "Access granted."}
     except:
         traceback.print_exc()
     return data

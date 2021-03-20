@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // components
 import Navbar from "components/Navbars/AuthNavbar.js";
@@ -59,76 +59,40 @@ export default class Landing extends Component {
                 </div>
               </div>
             </div>
-            <div
-              className="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-70-px"
-              style={{ transform: "translateZ(0)" }}
-            >
-              <svg
-                className="absolute bottom-0 overflow-hidden"
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="text-gray-300 fill-current"
-                  points="2560 0 2560 100 0 100"
-                ></polygon>
-              </svg>
-            </div>
           </div>
   
           <section className="pb-20 bg-gray-300 ">
             <div className="container mx-auto px-4">
             <h1 className="text-3xl mb-2 font-bold text-center">Companies on KickStart</h1>
-              <div className="fundraisers">
-                {/* <div className="lg:pt-12 pt-6 w-full md:w-5/12" > */}
-                    
+              <div className="fundraisers">                    
               {this.state.startups_list.map((data, index) => (
-                <div className="bg-white mb-8 w-50 shadow-lg rounded-lg company" key={index}>
+                
+                <Link className="bg-white mb-8 w-50 shadow-lg rounded-lg company" key={index}
+                to={{
+                  pathname: '/startUpIdea',
+                  state: {
+                    details: data}
+                 }}
+                >
                 <div className="p-2">
                     <img src="https://www.logodesign.net/logo/abstract-cuboid-building-4519ld.png" className="rounded-lg mb-2" alt=""/>
-                  <h5 className="text-xl font-semibold text-left px-3">{data.product_name}</h5>
-                  <h6 className="text-xxl text-left px-3">{data.company_name}</h6>
+                  <h3 className="text-xl font-semibold text-left px-3">{data.company_name}</h3>
+                  <h6 className="text-xl text-left px-3">{data.product_name}</h6>
                   <p className="mt-2 mb-2 text-gray-600 text-left  px-3">
-                    {data.problem_statement}
+                      {data.problem_statement.substring(0, 100) + "..."}
                   </p>
                   <hr className="mb-2 mt-2"/>
-                  <h6 className="text-xxl text-left  px-3 mb-4">Contact: {data.contact} <br/> Goal: {data.funding_goal}</h6>
+                  <h6 className="text-xxl text-left  px-3 mb-4">Contact: {data.contact} <br/> Goal: <b>{data.funding_goal}</b></h6>
                 </div>
-              </div>
-              ))}
-             
-               {/* </div> */}
-            </div>
-  
+              </Link>
               
+              ))}
+            </div>
+
             </div>
           </section>
   
-          <section className="relative py-20">
-            <div
-              className="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-              style={{ transform: "translateZ(0)" }}
-            >
-              <svg
-                className="absolute bottom-0 overflow-hidden"
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="text-white fill-current"
-                  points="2560 0 2560 100 0 100"
-                ></polygon>
-              </svg>
-            </div>
-  
+          <section className="relative py-20">  
             <div className="container mx-auto px-4">
               <div className="items-center flex flex-wrap">
                 <div className="w-full md:w-4/12 ml-auto mr-auto px-4">
@@ -194,163 +158,6 @@ export default class Landing extends Component {
               </div>
             </div>
           </section>
-  
-          {/* <section className="pt-20 pb-48">
-            <div className="container mx-auto px-4">
-              <div className="flex flex-wrap justify-center text-center mb-24">
-                <div className="w-full lg:w-6/12 px-4">
-                  <h2 className="text-4xl font-semibold">Here are our heroes</h2>
-                  <p className="text-lg leading-relaxed m-4 text-gray-600">
-                    According to the National Oceanic and Atmospheric
-                    Administration, Ted, Scambos, NSIDClead scentist, puts the
-                    potentially record maximum.
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-wrap">
-                <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                  <div className="px-6">
-                    <img
-                      alt="..."
-                      src={require("assets/img/team-1-800x800.jpg")}
-                      className="shadow-lg rounded-full mx-auto max-w-120-px"
-                    />
-                    <div className="pt-6 text-center">
-                      <h5 className="text-xl font-bold">Ryan Tompson</h5>
-                      <p className="mt-1 text-sm text-gray-500 uppercase font-semibold">
-                        Web Developer
-                      </p>
-                      <div className="mt-6">
-                        <button
-                          className="bg-blue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-twitter"></i>
-                        </button>
-                        <button
-                          className="bg-blue-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-facebook-f"></i>
-                        </button>
-                        <button
-                          className="bg-pink-500 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-dribbble"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                  <div className="px-6">
-                    <img
-                      alt="..."
-                      src={require("assets/img/team-2-800x800.jpg")}
-                      className="shadow-lg rounded-full mx-auto max-w-120-px"
-                    />
-                    <div className="pt-6 text-center">
-                      <h5 className="text-xl font-bold">Romina Hadid</h5>
-                      <p className="mt-1 text-sm text-gray-500 uppercase font-semibold">
-                        Marketing Specialist
-                      </p>
-                      <div className="mt-6">
-                        <button
-                          className="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-google"></i>
-                        </button>
-                        <button
-                          className="bg-blue-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-facebook-f"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                  <div className="px-6">
-                    <img
-                      alt="..."
-                      src={require("assets/img/team-3-800x800.jpg")}
-                      className="shadow-lg rounded-full mx-auto max-w-120-px"
-                    />
-                    <div className="pt-6 text-center">
-                      <h5 className="text-xl font-bold">Alexa Smith</h5>
-                      <p className="mt-1 text-sm text-gray-500 uppercase font-semibold">
-                        UI/UX Designer
-                      </p>
-                      <div className="mt-6">
-                        <button
-                          className="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-google"></i>
-                        </button>
-                        <button
-                          className="bg-blue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-twitter"></i>
-                        </button>
-                        <button
-                          className="bg-gray-800 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-instagram"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                  <div className="px-6">
-                    <img
-                      alt="..."
-                      src={require("assets/img/team-4-470x470.png")}
-                      className="shadow-lg rounded-full mx-auto max-w-120-px"
-                    />
-                    <div className="pt-6 text-center">
-                      <h5 className="text-xl font-bold">Jenna Kardi</h5>
-                      <p className="mt-1 text-sm text-gray-500 uppercase font-semibold">
-                        Founder and CEO
-                      </p>
-                      <div className="mt-6">
-                        <button
-                          className="bg-pink-500 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-dribbble"></i>
-                        </button>
-                        <button
-                          className="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-google"></i>
-                        </button>
-                        <button
-                          className="bg-blue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-twitter"></i>
-                        </button>
-                        <button
-                          className="bg-gray-800 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                          type="button"
-                        >
-                          <i className="fab fa-instagram"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section> */}
         </main>
         <Footer />
       </>

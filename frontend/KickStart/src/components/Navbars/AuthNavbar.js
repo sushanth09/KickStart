@@ -2,8 +2,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-// components
-import PagesDropdown from "components/Dropdowns/PagesDropdown.js";
+
+function handleLogout(){
+  if(window.localStorage.getItem("isLoggedIn")){
+    const url = `http://localhost:8000/kickstart/logout/${window.localStorage.getItem("email")}`;
+    fetch(url,{
+        method: "post",
+    }).then((response) => response.json())
+    .then(data => {
+        console.log(data)
+        window.localStorage.setItem("email", undefined);
+        window.localStorage.setItem("access_token", undefined);
+        window.localStorage.setItem("isLoggedIn", false);
+        
+    })
+  }
+}
+
 
 export default function Navbar(props) {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
@@ -18,13 +33,13 @@ export default function Navbar(props) {
             >
               KickStart
             </Link>
-            {/* <button
+            <button
               className="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
               type="button"
               onClick={() => setNavbarOpen(!navbarOpen)}
             >
               <i className="text-white fas fa-bars"></i>
-            </button> */}
+            </button>
           </div>
           <div
             className={
@@ -44,7 +59,6 @@ export default function Navbar(props) {
                   target="_blank"
                 >
                   <h1>FAQ</h1>
-                  <span className="lg:hidden inline-block ml-2">Share</span>
                 </a>
               </li>
 
@@ -55,20 +69,32 @@ export default function Navbar(props) {
                   target="_blank"
                 >
                   <h1>About</h1>
-                  <span className="lg:hidden inline-block ml-2">Tweet</span>
                 </a>
               </li>
 
               <li className="flex items-center">
-                <a
+                <span
                   className="lg:text-white lg:hover:text-gray-300 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
                   // href=""
                   target="_blank"
                 >
-                  <h1>Profile</h1>
-                  <span className="lg:hidden inline-block ml-2">Star</span>
-                </a>
+                  {window.localStorage.getItem("access_token") !== "undefined" ?
+                    <Link to="/profile">Profile</Link>  
+                    : <Link to="/auth/login">Login</Link>  
+                  }
+                </span>
               </li>
+              {window.localStorage.getItem("access_token") !== "undefined" ?
+                  <li className="flex items-center">
+                  <button
+                    className="lg:text-white lg:hover:text-gray-500 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                    onClick={handleLogout}
+                  >
+                    Logout                    
+                  </button>
+                </li>
+                : console.log(window.localStorage.getItem("isLoggedIn"))
+                }
             </ul>
           </div>
         </div>
